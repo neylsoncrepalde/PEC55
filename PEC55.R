@@ -4,6 +4,9 @@
 # Neylson Crepalde e Maria Alice Silveira
 #########################################
 
+#########
+#Facebook
+#########
 library(readr)
 library(descr)
 
@@ -96,5 +99,20 @@ bra = get_map(location = 'Brazil', zoom = 4)
 mapPoints <- ggmap(bra)+geom_point(aes(x = lng, y = lat, color=afavor),
                                    data = event, size=.6)+
   scale_color_manual(values=c("#0080FF", "#FE2E2E", "#0B6121"), 
-                                        name="Posicionamento", alpha = .5)
+                     name="Posicionamento", alpha = .5)
 mapPoints
+
+
+########
+#Twitter
+########
+library(jsonlite)
+
+rest = read_csv2('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_rest.txt')
+
+stream = fromJSON(sprintf("[%s]", 
+    paste(readLines("/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_stream_21_11_2016_12_23.txt"),
+          collapse=",")))
+
+names(rest)
+names(stream)
