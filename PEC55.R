@@ -52,8 +52,47 @@ for (i in 1:nrow(event)){
 }
 freq(event.concordancia)
 
+
+#Verificando o espaço de tempo para os eventos
+min(event$start_time)
+
+#testes estatísticos com as proporções
+
+x_evento = matrix(data = c(6.33,93.67,12.9231, 87.0769), ncol = 2, byrow = T)
+prop.test(x_evento) #não rejeita a H0 de proporções iguais
+x_page = matrix(data = c(6.33,93.67,5.127,94.873), ncol=2, byrow = T)
+prop.test(x_page) #não rejeita a H0 de proporções iguais
+
+
 #Plotando
 library(maptools)
+library(maps)
+
 estados = readShapePoly('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/estados_2010.shp')
 map(estados, col="#191919", fill=TRUE, bg="#000000", lwd=0.08)
-map(estados, col="#f2f2f2", fill=TRUE, bg="white", lwd=0.08)
+#map(estados, col="#f2f2f2", fill=TRUE, bg="white", lwd=0.08)
+title('Eventos - PEC 55 - Facebook', col.main="white", cex.main=1)
+
+for (row in 1:nrow(event)){
+  if (event$afavor[row] == 'contra'){
+    points(event$lng[row], event$lat[row], pch=19, col=adjustcolor('red', 0.9), cex = 0.8)
+  }
+  if (event$afavor[row] == 'neutro'){
+    points(event$lng[row], event$lat[row], pch=19, col=adjustcolor('green', 0.7), cex = 0.8)
+  }
+  else{
+    points(event$lng[row], event$lat[row], pch=19, col=adjustcolor('lightblue', 0.5), cex = 0.8)
+  }
+}
+
+legend('bottomleft', pch = 19, col= c(adjustcolor('red', 0.9),adjustcolor('green', 0.9),adjustcolor('lightblue', 0.9)),
+       legend = c('Contra','Neutro','A Favor'), text.col = 'white', bg = 'black')
+
+#
+library(ggmap)
+bra = get_map(location = 'Brazil', zoom = 4)
+mapPoints <- ggmap(bra)+geom_point(aes(x = lng, y = lat, color=afavor),
+                                   data = event, size=.6)+
+  scale_color_manual(values=c("#0080FF", "#FE2E2E", "#0B6121"), 
+                                        name="Posicionamento", alpha = .5)
+mapPoints
