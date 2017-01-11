@@ -7,8 +7,8 @@
 library(readr)
 library(descr)
 
-event = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55_search_event_2016_11_21_12_55_21.tab')
-page  = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55_search_page_2016_11_21_12_52_13.tab')
+event = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_search_event_2016_11_21_12_55_21.tab')
+page  = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_search_page_2016_11_21_12_52_13.tab')
 
 # classificando os eventos
 event$afavor = c('contra','neutro','neutro','contra','contra','contra','neutro','contra','contra','contra','neutro','contra','contra', #13
@@ -59,9 +59,11 @@ min(event$start_time)
 #testes estatísticos com as proporções
 
 x_evento = matrix(data = c(6.33,93.67,12.9231, 87.0769), ncol = 2, byrow = T)
-prop.test(x_evento) #não rejeita a H0 de proporções iguais
+t1 = prop.test(x_evento, correct = F) #não rejeita a H0 de proporções iguais
 x_page = matrix(data = c(6.33,93.67,5.127,94.873), ncol=2, byrow = T)
-prop.test(x_page) #não rejeita a H0 de proporções iguais
+t2 = prop.test(x_page, correct = F) #não rejeita a H0 de proporções iguais
+
+
 
 
 #Plotando
