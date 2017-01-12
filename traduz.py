@@ -10,11 +10,10 @@ import mtranslate as mt
 import csv
 import pandas as pd
 import os
-from time import sleep
 
-os.chdir('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/')
+os.chdir('D:/Neylson Crepalde/PEC55/')
 
-saida = open('dataset_traduzido.csv', 'w')
+saida = open('dataset_traduzido2.csv', 'w')
 export = csv.writer(saida, quoting=csv.QUOTE_NONNUMERIC)
 
 
@@ -26,9 +25,11 @@ dataset_unico = pd.read_csv('dataset_unico.csv', error_bad_lines=False)
 export.writerow(['pt','en'])
 
 for row in range(len(dataset_unico.index)):
-    pt = dataset_unico['pt'][row]
-    en = mt.translate(pt,'en','pt')
-    export.writerow([pt,en])
-    sleep(3)
-    
+	try:
+	    pt = dataset_unico['pt'][row]
+	    en = mt.translate(pt,'en','pt')
+	    export.writerow([pt,en])
+	
+	except UnicodeEncodeError as e:
+		continue
 saida.close()
