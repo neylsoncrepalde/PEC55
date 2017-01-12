@@ -6,7 +6,7 @@ Neylson Crepalde e Maria Alice Silveira
 Traduções
 Script: Neylson Crepalde
 """
-import goslate
+import mtranslate as mt
 import csv
 import pandas as pd
 import os
@@ -17,18 +17,18 @@ os.chdir('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/
 saida = open('dataset_traduzido.csv', 'w')
 export = csv.writer(saida, quoting=csv.QUOTE_NONNUMERIC)
 
-gs = goslate.Goslate()
-#print(gs.translate('Eu sei o que vcs fizeram no verão passado', 'en'))
+
+#print(mt.translate('Eu sei o que vcs fizeram no verão passado','en','pt'))
 
 dataset_unico = pd.read_csv('dataset_unico.csv', error_bad_lines=False)
 #dataset_unico['pt'][:20]
 
 export.writerow(['pt','en'])
 
-for row in range(5):
+for row in range(len(dataset_unico.index)):
     pt = dataset_unico['pt'][row]
-    en = gs.translate(pt,'en')
+    en = mt.translate(pt,'en','pt')
     export.writerow([pt,en])
-    sleep(5)
+    sleep(3)
     
 saida.close()
