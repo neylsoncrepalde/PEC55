@@ -168,11 +168,9 @@ plot(g2, edge.width=log(E(g2)$weight), vertex.label.cex=deg/15,
 ##################################################
 # Preparando dataset para traduzir no Python
 dataset_unico = unique(dataset)
+dataset_unico = as.data.frame(dataset_unico, stringsAsFactors = F)
+dataset_unico$num = 1
+head(dataset_unico)
 
-text <- gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", dataset_unico)
-text <- gsub("https", "", text)
-text <- gsub("http", "", text)
-grep("http", text)
-
-text_limpo <- text %>% tolower %>% removePunctuation %>% removeWords(., stopwords('pt'))
-head(text_limpo)
+write.table(dataset_unico, '/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/dataset_unico.csv',
+            sep=',', row.names = F, col.names = c('pt','num'))
