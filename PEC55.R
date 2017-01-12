@@ -116,3 +116,63 @@ stream = fromJSON(sprintf("[%s]",
 
 names(rest)
 names(stream)
+
+dataset = c(rest$text, stream$text)
+head(dataset)
+
+#############################################
+#Análises de texto
+library(tm)
+library(wordcloud)
+library(magrittr)
+
+dataset_tm = gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", dataset)
+dataset_tm <- gsub("https", "", dataset_tm)
+dataset_tm <- gsub("http", "", dataset_tm)
+grep("http", dataset_tm)
+
+dataset_tm <- dataset_tm %>% tolower %>% removePunctuation %>% removeWords(., stopwords('pt'))
+head(dataset_tm)
+
+pal <- brewer.pal(9,"YlGnBu")
+pal <- pal[-(1:4)]
+
+wordcloud(dataset_tm, min.freq = 5, random.order = F, colors = pal, max.words = 100)
+
+corpus = Corpus(VectorSource(dataset_tm))
+tdm = TermDocumentMatrix(corpus)
+tdm <- TermDocumentMatrix(corpus)
+tdm <- removeSparseTerms(tdm, sparse = 0.96)
+df <- as.data.frame(inspect(tdm))
+dim(df)
+df.scale <- scale(df)
+d <- dist(df.scale, method = "euclidean")
+fit.ward2 <- hclust(d, method = "ward.D2")
+plot(fit.ward2)
+
+rect.hclust(fit.ward2, k=7)
+
+library(igraph)
+matriz <- as.matrix(df)
+g <- graph_from_incidence_matrix(matriz)
+is.bipartite(g)
+g
+plot(g, vertex.size=4, vertex.label=V(g)$name, vertex.color=as.numeric(V(g)$type))
+g2 <- bipartite_projection(g, which = "FALSE")
+deg = degree(g2)
+plot(g2, edge.width=log(E(g2)$weight), vertex.label.cex=deg/15,
+     edge.color=adjustcolor("grey60", .5),
+     vertex.label.color=adjustcolor("blue", .7),
+     vertex.shape="none")
+
+##################################################
+# Preparando dataset para traduzir no Python
+dataset_unico = unique(dataset)
+
+text <- gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", dataset_unico)
+text <- gsub("https", "", text)
+text <- gsub("http", "", text)
+grep("http", text)
+
+text_limpo <- text %>% tolower %>% removePunctuation %>% removeWords(., stopwords('pt'))
+head(text_limpo)
