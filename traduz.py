@@ -19,14 +19,14 @@ export = csv.writer(saida, quoting=csv.QUOTE_NONNUMERIC)
 
 #print(mt.translate('Eu sei o que vcs fizeram no verão passado','en','pt'))
 
-dataset_unico = pd.read_csv('dataset_unico.csv', error_bad_lines=False)
+dataset = pd.read_csv('dataset.csv', error_bad_lines=False)
 #dataset_unico['pt'][:20]
 
 export.writerow(['pt','en'])
 
-for row in range(len(dataset_unico.index)):
+for row in range(len(dataset.index)):
 	try:
-	    pt = dataset_unico['pt'][row]
+	    pt = dataset['pt'][row]
 	    en = mt.translate(pt,'en','pt')
 	    export.writerow([pt,en])
 	
