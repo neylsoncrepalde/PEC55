@@ -32,4 +32,8 @@ for row in range(len(dataset.index)):
 	
 	except UnicodeEncodeError as e:
 		continue
+	except urllib.error.HTTPError as urlerror:
+		continue
 saida.close()
+
+print('Acabou.')
