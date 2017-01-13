@@ -277,6 +277,8 @@ g4 = ggplot(NULL, aes(x=1:6193, y=sentiments.nrc))+geom_line()+
 
 multiplot(g1,g2,g3,g4, cols=2)
 
+lapply(list(sentiments.syu, sentiments.bing, sentiments.afinn, sentiments.nrc), summary)
+
 #############################################
 # Sentiment Analysis com machine learning
 library(RTextTools)
