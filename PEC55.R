@@ -167,10 +167,13 @@ plot(g2, edge.width=log(E(g2)$weight), vertex.label.cex=deg/15,
 
 ##################################################
 # Preparando dataset para traduzir no Python
-dataset_unico = unique(dataset)
-dataset_unico = as.data.frame(dataset_unico, stringsAsFactors = F)
-dataset_unico$num = 1
-head(dataset_unico)
 
-write.table(dataset_unico, '/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/dataset_unico.csv',
-            sep=',', row.names = F, col.names = c('pt','num'))
+write.table(dataset, '/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/dataset.csv',
+            sep=',', row.names = F, col.names = 'pt')
+
+###############################################3
+# Importando os tweets traduzidos
+
+dataset_traduzido = read_csv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/dataset_traduzido2.csv')
+View(dataset_traduzido)
+
