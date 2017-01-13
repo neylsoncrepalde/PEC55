@@ -4,6 +4,54 @@
 # Neylson Crepalde e Maria Alice Silveira
 #########################################
 
+
+################################
+# Multiple plot function
+#
+# ggplot objects can be passed in ..., or to plotlist (as a list of ggplot objects)
+# - cols:   Number of columns in layout
+# - layout: A matrix specifying the layout. If present, 'cols' is ignored.
+#
+# If the layout is something like matrix(c(1,2,3,3), nrow=2, byrow=TRUE),
+# then plot 1 will go in the upper left, 2 will go in the upper right, and
+# 3 will go all the way across the bottom.
+#
+multiplot <- function(..., plotlist=NULL, file, cols=1, layout=NULL) {
+  library(grid)
+  
+  # Make a list from the ... arguments and plotlist
+  plots <- c(list(...), plotlist)
+  
+  numPlots = length(plots)
+  
+  # If layout is NULL, then use 'cols' to determine layout
+  if (is.null(layout)) {
+    # Make the panel
+    # ncol: Number of columns of plots
+    # nrow: Number of rows needed, calculated from # of cols
+    layout <- matrix(seq(1, cols * ceiling(numPlots/cols)),
+                     ncol = cols, nrow = ceiling(numPlots/cols))
+  }
+  
+  if (numPlots==1) {
+    print(plots[[1]])
+    
+  } else {
+    # Set up the page
+    grid.newpage()
+    pushViewport(viewport(layout = grid.layout(nrow(layout), ncol(layout))))
+    
+    # Make each plot, in the correct location
+    for (i in 1:numPlots) {
+      # Get the i,j matrix positions of the regions that contain this subplot
+      matchidx <- as.data.frame(which(layout == i, arr.ind = TRUE))
+      
+      print(plots[[i]], vp = viewport(layout.pos.row = matchidx$row,
+                                      layout.pos.col = matchidx$col))
+    }
+  }
+}
+
 #########
 #Facebook
 #########
@@ -192,16 +240,49 @@ sentiments.afinn = get_sentiment(dataset_traduzido$en, method = 'afinn')
 sentiments.nrc = get_sentiment(dataset_traduzido$en, method = 'nrc')
 
 #Plotando emotions_nrc
+col = '#F5A9A9'
+par(mfrow=c(2,1))
 barplot(
   sort(colSums(prop.table(emotions_nrc[ ,9:10]))), 
   horiz = TRUE, 
   cex.names = 0.7, 
-  las = 1, 
-  main = "Sentimentos", xlab="Percentage"
+  las = 1,
+  col = col,
+  main = "Sentimentos", xlab="Porcentagem"
 )
 
-ggplot(NULL, aes(x=1:6193, y=sentiments.syu))+geom_line()+
+barplot(
+  sort(colSums(prop.table(emotions_nrc[ ,1:8]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1,
+  col = col,
+  main = "Emoções", xlab="Porcentagem"
+)
+par(mfrow=c(1,1))
+
+#Plotando sentimentos
+g1 = ggplot(NULL, aes(x=1:6193, y=sentiments.syu))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
-  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - algoritmo Syuzhet')
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Syuzhet')
+g2 = ggplot(NULL, aes(x=1:6193, y=sentiments.bing))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Bing')
+g3 = ggplot(NULL, aes(x=1:6193, y=sentiments.afinn))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Arup Finn')
+g4 = ggplot(NULL, aes(x=1:6193, y=sentiments.nrc))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Mohammad-Turney')
+
+multiplot(g1,g2,g3,g4, cols=2)
+
+#############################################
+# Sentiment Analysis com machine learning
+library(RTextTools)
+library(e1071)
+
+
+
 
 
