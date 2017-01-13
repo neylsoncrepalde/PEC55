@@ -171,9 +171,37 @@ plot(g2, edge.width=log(E(g2)$weight), vertex.label.cex=deg/15,
 write.table(dataset, '/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/dataset.csv',
             sep=',', row.names = F, col.names = 'pt')
 
-###############################################3
+###############################################
 # Importando os tweets traduzidos
 
 dataset_traduzido = read_csv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/dataset_traduzido2.csv')
 View(dataset_traduzido)
+
+#################################################
+# Análise de sentimentos
+
+library(syuzhet)
+library(reshape2)
+library(coreNLP)
+library(ggplot2)
+library(ggthemes)
+emotions_nrc = get_nrc_sentiment(dataset_traduzido$en)
+sentiments.syu = get_sentiment(dataset_traduzido$en, method = 'syuzhet')
+sentiments.bing = get_sentiment(dataset_traduzido$en, method = 'bing')
+sentiments.afinn = get_sentiment(dataset_traduzido$en, method = 'afinn')
+sentiments.nrc = get_sentiment(dataset_traduzido$en, method = 'nrc')
+
+#Plotando emotions_nrc
+barplot(
+  sort(colSums(prop.table(emotions_nrc[ ,9:10]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1, 
+  main = "Sentimentos", xlab="Percentage"
+)
+
+ggplot(NULL, aes(x=1:6193, y=sentiments.syu))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - algoritmo Syuzhet')
+
 
