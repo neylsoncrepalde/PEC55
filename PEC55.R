@@ -365,9 +365,18 @@ matrix2 = create_matrix(dataset, language="pt",
                       stemWords=FALSE) %>% as.matrix
 
 container2 = create_container(matrix2, class_binario, trainSize = 1:100, testSize = 101:length(dataset), virgin = F)
-models2 = train_models(container2, algorithms=c("MAXENT" , "SVM", "RF", "NNET"))
+models2 = train_models(container2, algorithms=c("MAXENT" , "SVM", "RF"))
 results2 = classify_models(container2, models2)
 
-freq(results2$SVM_LABEL)
-freq(results2$MAXENTROPY_LABEL)
-freq(results2$FORESTS_LABEL)
+freq(results2$SVM_LABEL,plot=F)
+freq(results2$MAXENTROPY_LABEL,plot=F)
+freq(results2$FORESTS_LABEL,plot=F)  #WOW!
+
+xSVM = matrix(data = c(6.33,93.67,29.64,70.36), ncol=2, byrow=T)
+xMAXENT = matrix(data = c(6.33,93.67,48.13,51.87), ncol=2, byrow=T)
+xRF = matrix(data = c(6.33,93.67,4.194,95.806), ncol=2, byrow=T)
+
+prop.test(xSVM, correct = F)
+prop.test(xMAXENT, correct = F)
+prop.test(xRF, correct = F)
+
