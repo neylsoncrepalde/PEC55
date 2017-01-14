@@ -270,21 +270,104 @@ g2 = ggplot(NULL, aes(x=1:6193, y=sentiments.bing))+geom_line()+
   theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Bing')
 g3 = ggplot(NULL, aes(x=1:6193, y=sentiments.afinn))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
-  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Arup Finn')
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - AFinn')
 g4 = ggplot(NULL, aes(x=1:6193, y=sentiments.nrc))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
-  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Mohammad-Turney')
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - NRC')
 
 multiplot(g1,g2,g3,g4, cols=2)
 
 lapply(list(sentiments.syu, sentiments.bing, sentiments.afinn, sentiments.nrc), summary)
+
+sentiments.df = data.frame(sentiments.syu, sentiments.bing, sentiments.afinn, sentiments.nrc)
+stargazer::stargazer(sentiments.df, type='text')
 
 #############################################
 # Sentiment Analysis com machine learning
 library(RTextTools)
 library(e1071)
 
+#Classificando manualmente 100 tweets
+dataset[1:100]
+class_manual = c('neutro','contra','contra','contra','contra','contra','contra','contra','contra','contra',
+                 'contra','contra','contra','contra','contra','neutro','neutro','contra','a favor','a favor',
+                 'contra','neutro','a favor','contra','a favor','neutro','contra','neutro','contra','a favor',
+                 'a favor','neutro','contra','neutro','contra','neutro','neutro','neutro','neutro','contra',
+                 'neutro','contra','neutro','neutro','contra','contra','contra','contra','a favor','neutro',
+                 'contra','a favor','contra','contra','neutro','a favor','contra','a favor','contra','a favor',
+                 'contra','contra','neutro','contra','contra','contra','a favor','contra','contra','contra',
+                 'neutro','contra','contra','a favor','contra','a favor','contra','a favor','neutro','neutro',
+                 'contra','contra','a favor','contra','contra','contra','neutro','contra','neutro','neutro',
+                 'a favor','contra','a favor','a favor','contra','a favor','contra','contra','contra','contra')
+class_manual = as.factor(class_manual)
 
+#Tornando a classificação binária
+class_binario = c()
+for (i in class_manual){
+  if (i != 'contra'){
+    cla = 'não contra'
+    class_binario = c(class_binario, cla)
+  }
+  else{
+    cla = 'contra'
+    class_binario = c(class_binario, cla)
+  }
+}
+class_binario %<>% as.factor
 
+#Treinando o modelo
+train = dataset[1:100]
+test = dataset[101:length(dataset)]
 
+matrix= create_matrix(train, language="pt", 
+                      removeStopwords=FALSE, removeNumbers=TRUE, 
+                      stemWords=FALSE) %>% as.matrix
 
+classifier = naiveBayes(x=matrix[1:70,], y=class_binario[1:70])
+predicted = predict(classifier, matrix[71:100]); predicted
+table(predicted, class_binario[71:100])
+recall_accuracy(predicted, class_binario[71:100])
+freq(predicted)
+
+###############################################
+# tentando outros algoritmos de machine learning
+container = create_container(matrix, class_binario, trainSize = 1:70, testSize = 71:100, virgin = F)
+models = train_models(container, algorithms=c("MAXENT" , "SVM", "RF", "BAGGING", "TREE", "GLMNET"))
+results = classify_models(container, models)
+
+# Tabelas de acurácia e 
+table(results$MAXENTROPY_LABEL, class_binario[71:100])
+recall_accuracy(results$MAXENTROPY_LABEL, class_binario[71:100])
+table(results$SVM_LABEL, class_binario[71:100])
+recall_accuracy(results$SVM_LABEL, class_binario[71:100])
+table(results$FORESTS_LABEL, class_binario[71:100])
+recall_accuracy(results$FORESTS_LABEL, class_binario[71:100])
+table(results$BAGGING_LABEL, class_binario[71:100])
+recall_accuracy(results$BAGGING_LABEL, class_binario[71:100])
+table(results$TREE_LABEL, class_binario[71:100])
+recall_accuracy(results$TREE_LABEL, class_binario[71:100])
+table(results$GLMNET_LABEL, class_binario[71:100])
+recall_accuracy(results$GLMNET_LABEL, class_binario[71:100])
+
+#cross-validation
+N=4
+set.seed(2014)
+cross_validate(container,N,"MAXENT")
+cross_validate(container,N,"TREE")
+cross_validate(container,N,"SVM")
+cross_validate(container,N,"RF")
+cross_validate(container,N,"GLMNET")
+
+#Os melhores são Máxima Entropia e Support Vector Machines
+# Vamos aos dados
+matrix2 = create_matrix(dataset, language="pt", 
+                      removeStopwords=FALSE, removeNumbers=TRUE, 
+                      stemWords=FALSE) %>% as.matrix
+
+container2 = create_container(matrix2, class_binario, trainSize = 1:100, testSize = 101:length(dataset), virgin = F)
+models2 = train_models(container2, algorithms=c("MAXENT" , "SVM", "RF", "NNET"))
+results2 = classify_models(container2, models2)
+
+freq(results2$SVM_LABEL)
+freq(results2$MAXENTROPY_LABEL)
+freq(results2$FORESTS_LABEL)
