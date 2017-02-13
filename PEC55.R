@@ -150,6 +150,41 @@ mapPoints <- ggmap(bra)+geom_point(aes(x = lng, y = lat, color=afavor),
                      name="Posicionamento", alpha = .5)
 mapPoints
 
+###############
+# Análise de conteúdo FACEBOOK
+
+library(tm)
+library(wordcloud)
+library(magrittr)
+
+names(event)
+head(event$description)
+names(page)
+head(page$description)
+
+descricoes = c(event$description, page$description)
+length(descricoes)
+
+texto = descricoes %>% tolower %>% removePunctuation %>%
+  removeWords(., stopwords('pt')) %>% removeWords(., c('pec','241','55', '24155'))
+
+pal <- brewer.pal(9,"YlGnBu")
+pal <- pal[-(1:4)]
+
+wordcloud(texto, min.freq = 3, random.order = F, colors = pal, max.words = 100)
+
+corpus = Corpus(VectorSource(texto))
+tdm <- TermDocumentMatrix(corpus)
+tdm <- removeSparseTerms(tdm, sparse = 0.90)
+df <- as.data.frame(inspect(tdm))
+dim(df)
+df.scale <- scale(df)
+d <- dist(df.scale, method = "euclidean")
+fit.ward2 <- hclust(d, method = "ward.D2")
+plot(fit.ward2)
+
+rect.hclust(fit.ward2, k=8)
+
 
 ########
 #Twitter
