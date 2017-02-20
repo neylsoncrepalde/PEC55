@@ -185,6 +185,40 @@ plot(fit.ward2)
 
 rect.hclust(fit.ward2, k=8)
 
+###################################################
+# Analise de sentimentos Facebook
+
+mbl = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/MBL/page_204223673035117_2017_02_17_15_59_08_topcomments.tab')
+endireita_brasil = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Endireita Brasil/page_97663407343_2017_02_16_01_46_51_comments.tab')
+vem_pra_rua = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Vem pra Rua/page_344408492407172_2017_02_16_01_45_04_comments.tab')
+
+direita = rbind(mbl, endireita_brasil[,c(2,4:6,9:11)], vem_pra_rua[,c(2,4:6,9:11)])
+
+une = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/UNE/page_241149405912525_2017_02_16_01_53_23_comments.tab')
+midia_ninja = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Mídia Ninja/page_164188247072662_2017_02_16_02_08_36_comments.tab')
+jornalistas_livres = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Jornalistas Livres/page_292074710916413_2017_02_16_02_30_42_comments.tab')
+
+esquerda = rbind(une[,c(2,4:6,9:11)], midia_ninja[,c(2,4:6,9:11)], jornalistas_livres[,c(2,4:6,9:11)])
+
+#Posts
+direita_posts = direita$post_text %>% tolower %>% removePunctuation %>%
+  removeWords(., stopwords('pt'))
+esquerda_posts = esquerda$post_text %>% tolower %>% removePunctuation %>%
+  removeWords(., stopwords('pt'))
+
+wordcloud(direita_posts, min.freq = 3, max.words = 100, random.order = F, colors = pal)
+wordcloud(esquerda_posts, min.freq = 3, max.words = 100, random.order = F, colors = pal)
+
+#Comentários
+direita_coments = direita$comment_message %>% tolower %>% removePunctuation %>%
+  removeWords(., stopwords('pt'))
+esquerda_coments = esquerda$comment_message %>% tolower %>% removePunctuation %>%
+  removeWords(., stopwords('pt'))
+
+wordcloud(direita_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
+wordcloud(esquerda_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
+
+
 
 ########
 #Twitter
@@ -194,8 +228,8 @@ library(jsonlite)
 rest = read_csv2('/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_rest.txt')
 
 stream = fromJSON(sprintf("[%s]", 
-    paste(readLines("/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_stream_21_11_2016_12_23.txt"),
-          collapse=",")))
+                          paste(readLines("/home/neylson/Documentos/Neylson Crepalde/Doutorado/big_data_projects/PEC55/PEC55_stream_21_11_2016_12_23.txt"),
+                                collapse=",")))
 
 names(rest)
 names(stream)
@@ -396,8 +430,8 @@ cross_validate(container,N,"GLMNET")
 #Os melhores são Máxima Entropia e Support Vector Machines
 # Vamos aos dados
 matrix2 = create_matrix(dataset, language="pt", 
-                      removeStopwords=FALSE, removeNumbers=TRUE, 
-                      stemWords=FALSE) %>% as.matrix
+                        removeStopwords=FALSE, removeNumbers=TRUE, 
+                        stemWords=FALSE) %>% as.matrix
 
 container2 = create_container(matrix2, class_binario, trainSize = 1:100, testSize = 101:length(dataset), virgin = F)
 models2 = train_models(container2, algorithms=c("MAXENT" , "SVM", "RF"))
@@ -414,4 +448,3 @@ xRF = matrix(data = c(6.33,93.67,4.194,95.806), ncol=2, byrow=T)
 prop.test(xSVM, correct = F)
 prop.test(xMAXENT, correct = F)
 prop.test(xRF, correct = F)
-
