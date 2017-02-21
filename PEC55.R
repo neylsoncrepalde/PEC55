@@ -209,6 +209,19 @@ esquerda_posts = esquerda$post_text %>% tolower %>% removePunctuation %>%
 wordcloud(direita_posts, min.freq = 3, max.words = 100, random.order = F, colors = pal)
 wordcloud(esquerda_posts, min.freq = 3, max.words = 100, random.order = F, colors = pal)
 
+corpus = Corpus(VectorSource(direita_posts))
+tdm <- TermDocumentMatrix(corpus)
+tdm <- removeSparseTerms(tdm, sparse = 0.96)
+df <- as.data.frame(inspect(tdm))
+dim(df)
+df.scale <- scale(df)
+d <- dist(df.scale, method = "euclidean")
+fit.ward2 <- hclust(d, method = "ward.D2")
+plot(fit.ward2)
+
+rect.hclust(fit.ward2, k=8)############
+
+
 #Comentários
 direita_coments = direita$comment_message %>% tolower %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
