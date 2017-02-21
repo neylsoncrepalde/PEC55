@@ -202,7 +202,7 @@ esquerda = rbind(une[,c(2,4:6,9:11)], midia_ninja[,c(2,4:6,9:11)], jornalistas_l
 
 #Posts
 direita_posts = direita$post_text %>% tolower %>% removePunctuation %>%
-  removeWords(., stopwords('pt'))
+  removeWords(., stopwords('pt')) ### Ainda remover https
 esquerda_posts = esquerda$post_text %>% tolower %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
 
@@ -211,7 +211,7 @@ wordcloud(esquerda_posts, min.freq = 3, max.words = 100, random.order = F, color
 
 corpus = Corpus(VectorSource(direita_posts))
 tdm <- TermDocumentMatrix(corpus)
-tdm <- removeSparseTerms(tdm, sparse = 0.96)
+tdm <- removeSparseTerms(tdm, sparse = 0.91)
 df <- as.data.frame(inspect(tdm))
 dim(df)
 df.scale <- scale(df)
