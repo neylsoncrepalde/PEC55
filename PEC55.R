@@ -201,9 +201,11 @@ jornalistas_livres = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutora
 esquerda = rbind(une[,c(2,4:6,9:11)], midia_ninja[,c(2,4:6,9:11)], jornalistas_livres[,c(2,4:6,9:11)])
 
 #Posts
-direita_posts = direita$post_text %>% tolower %>% removePunctuation %>%
-  removeWords(., stopwords('pt')) ### Ainda remover https
-esquerda_posts = esquerda$post_text %>% tolower %>% removePunctuation %>%
+direita_posts = direita$post_text %>% tolower %>% 
+  gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", .) %>% removePunctuation %>%
+  removeWords(., stopwords('pt'))
+esquerda_posts = esquerda$post_text %>% tolower %>% 
+  gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", .) %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
 
 wordcloud(direita_posts, min.freq = 3, max.words = 100, random.order = F, colors = pal)
@@ -211,7 +213,7 @@ wordcloud(esquerda_posts, min.freq = 3, max.words = 100, random.order = F, color
 
 corpus = Corpus(VectorSource(direita_posts))
 tdm <- TermDocumentMatrix(corpus)
-tdm <- removeSparseTerms(tdm, sparse = 0.91)
+tdm <- removeSparseTerms(tdm, sparse = 0.90)
 df <- as.data.frame(inspect(tdm))
 dim(df)
 df.scale <- scale(df)
@@ -219,19 +221,72 @@ d <- dist(df.scale, method = "euclidean")
 fit.ward2 <- hclust(d, method = "ward.D2")
 plot(fit.ward2)
 
-rect.hclust(fit.ward2, k=8)############
+rect.hclust(fit.ward2, k=6)############
+###
+
+corpus = Corpus(VectorSource(esquerda_posts))
+tdm <- TermDocumentMatrix(corpus)
+tdm <- removeSparseTerms(tdm, sparse = 0.85)
+df <- as.data.frame(inspect(tdm))
+dim(df)
+df.scale <- scale(df)
+d <- dist(df.scale, method = "euclidean")
+fit.ward2 <- hclust(d, method = "ward.D2")
+plot(fit.ward2)
+
+rect.hclust(fit.ward2, k=6)############
+
+
 
 
 #Comentários
-direita_coments = direita$comment_message %>% tolower %>% removePunctuation %>%
-  removeWords(., stopwords('pt'))
-esquerda_coments = esquerda$comment_message %>% tolower %>% removePunctuation %>%
-  removeWords(., stopwords('pt'))
+direita_coments = direita$comment_message %>% tolower %>% 
+  removePunctuation %>% removeWords(., stopwords('pt'))
+esquerda_coments = esquerda$comment_message %>% tolower %>% 
+  removePunctuation %>% removeWords(., stopwords('pt'))
 
 wordcloud(direita_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
 wordcloud(esquerda_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
 
+###
+corpus = Corpus(VectorSource(direita_coments))
+tdm <- TermDocumentMatrix(corpus)
+tdm <- removeSparseTerms(tdm, sparse = 0.94)
+df <- as.data.frame(inspect(tdm))
+dim(df)
+df.scale <- scale(df)
+d <- dist(df.scale, method = "euclidean")
+fit.ward2 <- hclust(d, method = "ward.D2")
+plot(fit.ward2)
 
+rect.hclust(fit.ward2, k=6)############
+###
+
+corpus = Corpus(VectorSource(esquerda_coments))
+tdm <- TermDocumentMatrix(corpus)
+tdm <- removeSparseTerms(tdm, sparse = 0.85)
+df <- as.data.frame(inspect(tdm))
+dim(df)
+df.scale <- scale(df)
+d <- dist(df.scale, method = "euclidean")
+fit.ward2 <- hclust(d, method = "ward.D2")
+plot(fit.ward2)
+
+rect.hclust(fit.ward2, k=6)############
+
+
+#########
+#Escrevendos dados para tradução automática
+
+setwd('~/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55')
+names(direita_posts) = 'pt'
+names(esquerda_posts) = 'pt'
+names(direita_coments) = 'pt'
+names(esquerda_coments) = 'pt'
+#write.csv(direita_posts, 'direita_posts.csv', row.names = F)
+#write.csv(esquerda_posts, 'esquerda_posts.csv', row.names = F)
+#write.csv(direita_coments, 'direita_coments.csv', row.names = F)
+#write.csv(esquerda_coments, 'esquerda_coments.csv', row.names = F)
 
 ########
 #Twitter
