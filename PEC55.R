@@ -187,24 +187,32 @@ rect.hclust(fit.ward2, k=8)
 
 ###################################################
 # Analise de sentimentos Facebook
+library(data.table)
+library(bit64)
 
-mbl = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/MBL/page_204223673035117_2017_02_17_15_59_08_topcomments.tab')
-endireita_brasil = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Endireita Brasil/page_97663407343_2017_02_16_01_46_51_comments.tab')
-vem_pra_rua = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Vem pra Rua/page_344408492407172_2017_02_16_01_45_04_comments.tab')
+mbl = fread('D:/Neylson Crepalde/PEC55/MBL/page_204223673035117_2017_02_17_15_59_08_topcomments.tab', encoding = 'UTF-8') %>%
+  as.data.frame(., stringsAsFactors=F)
+endireita_brasil = fread('D:/Neylson Crepalde/PEC55/Endireita Brasil/page_97663407343_2017_02_16_01_46_51_comments.tab', encoding = 'UTF-8') %>%
+  as.data.frame(., stringsAsFactors=F)
+vem_pra_rua = fread('D:/Neylson Crepalde/PEC55/Vem pra Rua/page_344408492407172_2017_02_16_01_45_04_comments.tab', encoding = 'UTF-8') %>%
+  as.data.frame(., stringsAsFactors=F)
 
 direita = rbind(mbl, endireita_brasil[,c(2,4:6,9:11)], vem_pra_rua[,c(2,4:6,9:11)])
 
-une = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/UNE/page_241149405912525_2017_02_16_01_53_23_comments.tab')
-midia_ninja = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Mídia Ninja/page_164188247072662_2017_02_16_02_08_36_comments.tab')
-jornalistas_livres = read_tsv('/home/neylson/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55/PEC55 - dados/Jornalistas Livres/page_292074710916413_2017_02_16_02_30_42_comments.tab')
+une = fread('D:/Neylson Crepalde/PEC55/UNE/page_241149405912525_2017_02_16_01_53_23_comments.tab', encoding = 'UTF-8') %>%
+  as.data.frame(., stringsAsFactors=F)
+midia_ninja = fread('D:/Neylson Crepalde/PEC55/Mídia Ninja/page_164188247072662_2017_02_16_02_08_36_comments.tab', encoding = 'UTF-8') %>%
+  as.data.frame(., stringsAsFactors=F)
+jornalistas_livres = fread('D:/Neylson Crepalde/PEC55/Jornalistas Livres/page_292074710916413_2017_02_16_02_30_42_comments.tab', encoding = 'UTF-8') %>%
+  as.data.frame(., stringsAsFactors=F)
 
 esquerda = rbind(une[,c(2,4:6,9:11)], midia_ninja[,c(2,4:6,9:11)], jornalistas_livres[,c(2,4:6,9:11)])
 
 #Posts
-direita_posts = direita$post_text %>% tolower %>% 
+direita_posts = direita$post_text %>% 
   gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", .) %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
-esquerda_posts = esquerda$post_text %>% tolower %>% 
+esquerda_posts = esquerda$post_text %>%
   gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", .) %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
 
@@ -240,9 +248,9 @@ rect.hclust(fit.ward2, k=6)############
 
 
 #Comentários
-direita_coments = direita$comment_message %>% tolower %>% 
+direita_coments = direita$comment_message %>%
   removePunctuation %>% removeWords(., stopwords('pt'))
-esquerda_coments = esquerda$comment_message %>% tolower %>% 
+esquerda_coments = esquerda$comment_message %>%
   removePunctuation %>% removeWords(., stopwords('pt'))
 
 wordcloud(direita_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
@@ -278,7 +286,7 @@ rect.hclust(fit.ward2, k=6)############
 #########
 #Escrevendos dados para tradução automática
 
-setwd('~/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55')
+setwd('D:/Neylson Crepalde/PEC55')
 names(direita_posts) = 'pt'
 names(esquerda_posts) = 'pt'
 names(direita_coments) = 'pt'
@@ -287,6 +295,8 @@ names(esquerda_coments) = 'pt'
 #write.csv(esquerda_posts, 'esquerda_posts.csv', row.names = F)
 #write.csv(direita_coments, 'direita_coments.csv', row.names = F)
 #write.csv(esquerda_coments, 'esquerda_coments.csv', row.names = F)
+
+
 
 ########
 #Twitter
