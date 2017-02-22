@@ -212,7 +212,7 @@ esquerda = rbind(une[,c(2,4:6,9:11)], midia_ninja[,c(2,4:6,9:11)], jornalistas_l
 direita_posts = direita$post_text %>% 
   gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", .) %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
-esquerda_posts = esquerda$post_text %>%
+esquerda_posts = esquerda$post_text %>% 
   gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", .) %>% removePunctuation %>%
   removeWords(., stopwords('pt'))
 
@@ -246,12 +246,22 @@ rect.hclust(fit.ward2, k=6)############
 
 
 
-
+### PAREI AQUI!!!
 #Comentários
-direita_coments = direita$comment_message %>%
+direita_coments = direita$comment_message %>% 
   removePunctuation %>% removeWords(., stopwords('pt'))
-esquerda_coments = esquerda$comment_message %>%
+Encoding(direita_coments) = 'latin1'
+direita_coments %<>% tolower
+Encoding(direita_coments) = 'utf8'
+direita_coments %<>% removeWords(., stopwords('pt'))
+
+esquerda_coments = esquerda$comment_message %>% 
   removePunctuation %>% removeWords(., stopwords('pt'))
+Encoding(esquerda_coments) = 'latin1'
+esquerda_coments %<>% tolower
+Encoding(esquerda_coments) = 'utf8'
+esquerda_coments %<>% removeWords(., stopwords('pt'))
+
 
 wordcloud(direita_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
 wordcloud(esquerda_coments, min.freq = 3, max.words = 100, random.order = F, colors = pal)
