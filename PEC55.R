@@ -249,7 +249,6 @@ rect.hclust(fit.ward2, k=6)############
 
 
 
-### PAREI AQUI!!!
 #Comentários
 direita_coments = direita$comment_message %>% tolower %>%
   removePunctuation %>% removeWords(., stopwords('pt'))
@@ -299,6 +298,77 @@ names(esquerda_coments) = 'pt'
 #write.csv(esquerda_posts, 'esquerda_posts.csv', row.names = F)
 #write.csv(direita_coments, 'direita_coments.csv', row.names = F)
 #write.csv(esquerda_coments, 'esquerda_coments.csv', row.names = F)
+
+###############################################
+# Importando os posts traduzidos
+setwd('C:/Users/x6905399/Documents/Artigos/Big data politics')
+dataset_traduzido = fread('esquerda_posts_traduzido.csv') %>%
+  as.data.frame(., stringsAsFactors=F)
+View(dataset_traduzido)
+
+#################################################
+# Análise de sentimentos
+
+library(syuzhet)
+library(reshape2)
+library(coreNLP)
+library(ggplot2)
+library(ggthemes)
+emotions_nrc = get_nrc_sentiment(dataset_traduzido$en)
+sentiments.syu = get_sentiment(dataset_traduzido$en, method = 'syuzhet')
+sentiments.bing = get_sentiment(dataset_traduzido$en, method = 'bing')
+sentiments.afinn = get_sentiment(dataset_traduzido$en, method = 'afinn')
+sentiments.nrc = get_sentiment(dataset_traduzido$en, method = 'nrc')
+
+#Plotando emotions_nrc
+col = '#F5A9A9'
+par(mfrow=c(2,1))
+barplot(
+  sort(colSums(prop.table(emotions_nrc[ ,9:10]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1,
+  col = col,
+  main = "Sentimentos", xlab="Porcentagem"
+)
+
+barplot(
+  sort(colSums(prop.table(emotions_nrc[ ,1:8]))), 
+  horiz = TRUE, 
+  cex.names = 0.7, 
+  las = 1,
+  col = col,
+  main = "Emoções", xlab="Porcentagem"
+)
+par(mfrow=c(1,1))
+
+#Plotando sentimentos
+g1 = ggplot(NULL, aes(x=1:321, y=sentiments.syu))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Syuzhet')
+g2 = ggplot(NULL, aes(x=1:321, y=sentiments.bing))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Bing')
+g3 = ggplot(NULL, aes(x=1:321, y=sentiments.afinn))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - AFinn')
+g4 = ggplot(NULL, aes(x=1:321, y=sentiments.nrc))+geom_line()+
+  geom_hline(yintercept = 0, col = 3, lty = 2)+
+  theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - NRC')
+
+multiplot(g1,g2,g3,g4, cols=2)
+
+lapply(list(sentiments.syu, sentiments.bing, sentiments.afinn, sentiments.nrc), summary)
+
+sentiments.df = data.frame(sentiments.syu, sentiments.bing, sentiments.afinn, sentiments.nrc)
+stargazer::stargazer(sentiments.df, type='text')
+#####################################################
+
+
+
+
+
+
 
 ########
 #Twitter
