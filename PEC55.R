@@ -301,10 +301,13 @@ names(esquerda_coments) = 'pt'
 
 ###############################################
 # Importando os posts traduzidos
-setwd('C:/Users/x6905399/Documents/Artigos/Big data politics')
-dataset_traduzido = fread('esquerda_posts_traduzido.csv') %>%
+setwd('~/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55')
+dataset_traduzido = read_csv('esquerda_coments_traduzido.csv') %>%
   as.data.frame(., stringsAsFactors=F)
 View(dataset_traduzido)
+
+relacionado_a_pec = grep('pec ' ,dataset_traduzido$pt)
+dataset_pec = dataset_traduzido[relacionado_a_pec,]
 
 #################################################
 # Análise de sentimentos
@@ -314,11 +317,11 @@ library(reshape2)
 library(coreNLP)
 library(ggplot2)
 library(ggthemes)
-emotions_nrc = get_nrc_sentiment(dataset_traduzido$en)
-sentiments.syu = get_sentiment(dataset_traduzido$en, method = 'syuzhet')
-sentiments.bing = get_sentiment(dataset_traduzido$en, method = 'bing')
-sentiments.afinn = get_sentiment(dataset_traduzido$en, method = 'afinn')
-sentiments.nrc = get_sentiment(dataset_traduzido$en, method = 'nrc')
+emotions_nrc = get_nrc_sentiment(dataset_pec$en)
+sentiments.syu = get_sentiment(dataset_pec$en, method = 'syuzhet')
+sentiments.bing = get_sentiment(dataset_pec$en, method = 'bing')
+sentiments.afinn = get_sentiment(dataset_pec$en, method = 'afinn')
+sentiments.nrc = get_sentiment(dataset_pec$en, method = 'nrc')
 
 #Plotando emotions_nrc
 col = '#F5A9A9'
@@ -343,16 +346,16 @@ barplot(
 par(mfrow=c(1,1))
 
 #Plotando sentimentos
-g1 = ggplot(NULL, aes(x=1:321, y=sentiments.syu))+geom_line()+
+g1 = ggplot(NULL, aes(x=1:length(sentiments.syu), y=sentiments.syu))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
   theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Syuzhet')
-g2 = ggplot(NULL, aes(x=1:321, y=sentiments.bing))+geom_line()+
+g2 = ggplot(NULL, aes(x=1:length(sentiments.bing), y=sentiments.bing))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
   theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - Bing')
-g3 = ggplot(NULL, aes(x=1:321, y=sentiments.afinn))+geom_line()+
+g3 = ggplot(NULL, aes(x=1:length(sentiments.afinn), y=sentiments.afinn))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
   theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - AFinn')
-g4 = ggplot(NULL, aes(x=1:321, y=sentiments.nrc))+geom_line()+
+g4 = ggplot(NULL, aes(x=1:length(sentiments.nrc), y=sentiments.nrc))+geom_line()+
   geom_hline(yintercept = 0, col = 3, lty = 2)+
   theme_tufte()+labs(x='',y='Sentiment score',title='Sentiment Analysis - NRC')
 
