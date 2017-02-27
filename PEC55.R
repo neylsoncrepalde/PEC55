@@ -302,7 +302,7 @@ names(esquerda_coments) = 'pt'
 ###############################################
 # Importando os posts traduzidos
 setwd('~/Documentos/Neylson Crepalde/Doutorado/Artigos meus/PEC55')
-dataset_traduzido = read_csv('esquerda_coments_traduzido.csv') %>%
+dataset_traduzido = read_csv('direita_coments_traduzido.csv') %>%
   as.data.frame(., stringsAsFactors=F)
 View(dataset_traduzido)
 
@@ -395,11 +395,29 @@ head(dataset)
 library(tm)
 library(wordcloud)
 library(magrittr)
+library(stringr)
 
 dataset_tm = gsub("(f|ht)tp(s?)://(.*)[.][a-z]+", "", dataset)
 dataset_tm <- gsub("https", "", dataset_tm)
 dataset_tm <- gsub("http", "", dataset_tm)
 grep("http", dataset_tm)
+
+#plotando os usuários mais citados
+friends <- str_extract_all(dataset, "@\\w+")
+friends = Corpus(VectorSource(friends))
+wordcloud(words = friends, max.words=50, random.order=FALSE, 
+           min.freq = 4, colors=pal)
+#plotando as hashtags mais usadas
+hashtags <- str_extract_all(dataset, "#\\w+")
+hashtags = Corpus(VectorSource(hashtags))
+wordcloud(words = hashtags, max.words=50, random.order=FALSE, 
+          min.freq = 4, colors=pal)
+#plotando os usuários que mais atuam (tweetam)
+usuarios <- c(rest$screenName, stream$user$screen_name)
+wordcloud(usuarios, max.words = 50, random.order = F, min.freq = 5, colors = pal)
+
+
+
 
 dataset_tm <- dataset_tm %>% tolower %>% removePunctuation %>% removeWords(., stopwords('pt'))
 head(dataset_tm)
